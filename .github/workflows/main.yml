@@ -10,29 +10,31 @@ jobs:
   test-pact:
     runs-on: ubuntu-latest
 
+    # DÜZELTME BURADA: Şifreleri "steps" içinden alıp buraya,
+    # en tepeye (Global) taşıdık. Artık her adım bunları görebilir.
+    env:
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_NAME: ${{ secrets.DB_NAME }}
+      DB_PORT: ${{ secrets.DB_PORT }}
+      API_GATEWAY_PORT: ${{ secrets.API_GATEWAY_PORT }}
+      CORE_BANKING_PORT: ${{ secrets.CORE_BANKING_PORT }}
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
       - name: Start Containers
-        env:
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_PORT: ${{ secrets.DB_PORT }}
-          API_GATEWAY_PORT: ${{ secrets.API_GATEWAY_PORT }}
-          CORE_BANKING_PORT: ${{ secrets.CORE_BANKING_PORT }}
-        # DÜZELTME 1: Tire kalktı, boşluk geldi (v2)
+        # Buradaki 'env' kısmını sildik çünkü yukarıya taşıdık
         run: docker compose up -d --build
 
       - name: Wait for Services (30s)
         run: sleep 30
 
       - name: Run Pact Contract Tests 🧪
-        # DÜZELTME 2: Tire kalktı, boşluk geldi
+        # Artık bu komut da yukarıdaki şifreleri okuyabilecek
         run: docker compose exec -T api-gateway npm run test:pact
 
       - name: Stop Containers
         if: always()
-        # DÜZELTME 3: Tire kalktı, boşluk geldi
         run: docker compose down
