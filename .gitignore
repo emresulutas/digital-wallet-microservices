@@ -1,0 +1,10 @@
+# Şifreleri Gönderme (GÜVENLİK)
+.env
+
+# Gereksiz Dosyalar
+node_modules/
+dist/
+.DS_Store
+
+# Docker (Veritabanı dosyaları gitmesin)
+pgdata/

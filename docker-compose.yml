@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  # 1. VERİTABANI
+  database:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${DB_USER}      # .env'den okuyacak
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  # 2. BANKA SERVİSİ
+  core-banking:
+    build: ./core-banking
+    ports:
+      - "${CORE_BANKING_PORT}:${CORE_BANKING_PORT}"
+    environment:
+      DB_HOST: database
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASSWORD}  # Şifreyi buraya aktarıyoruz
+      DB_NAME: ${DB_NAME}
+    depends_on:
+      - database
+
+  # 3. VEZNE (GATEWAY)
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
+    environment:
+      BANK_URL: http://core-banking:${CORE_BANKING_PORT}
+    depends_on:
+      - core-banking
+
+volumes:
+  pgdata:

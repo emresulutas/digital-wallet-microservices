@@ -1,0 +1,83 @@
+{
+  "consumer": {
+    "name": "ApiGateway"
+  },
+  "interactions": [
+    {
+      "description": "geçerli bir para transfer isteği",
+      "providerStates": [
+        {
+          "name": "transfer servisi çalışıyor"
+        }
+      ],
+      "request": {
+        "body": {
+          "amount": 500
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "method": "POST",
+        "path": "/transfer"
+      },
+      "response": {
+        "body": {
+          "amount": 500,
+          "status": "success"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          }
+        },
+        "status": 201
+      }
+    },
+    {
+      "description": "hatalı bir transfer isteği (metin içeren)",
+      "providerStates": [
+        {
+          "name": "transfer servisi çalışıyor"
+        }
+      ],
+      "request": {
+        "body": {
+          "amount": "beş yüz tl"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "method": "POST",
+        "path": "/transfer"
+      },
+      "response": {
+        "status": 400
+      }
+    }
+  ],
+  "metadata": {
+    "pact-js": {
+      "version": "16.0.2"
+    },
+    "pactRust": {
+      "ffi": "0.4.28",
+      "models": "1.3.5"
+    },
+    "pactSpecification": {
+      "version": "3.0.0"
+    }
+  },
+  "provider": {
+    "name": "CoreBanking"
+  }
+}
