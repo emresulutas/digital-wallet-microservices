@@ -1,25 +1,19 @@
 name: Digital Wallet CI 🚀
 
-# 1. TETİKLEYİCİ: Bu robot ne zaman çalışsın?
 on:
   push:
-    branches: [ "main", "master" ] # Ana dala kod atıldığında
+    branches: [ "main", "master" ]
   pull_request:
-    branches: [ "main", "master" ] # Biri kod birleştirmek istediğinde
+    branches: [ "main", "master" ]
 
-# 2. GÖREVLER: Robot ne yapsın?
 jobs:
   test-pact:
-    # GitHub'ın bize vereceği sanal bilgisayar (Ubuntu Linux)
     runs-on: ubuntu-latest
 
     steps:
-      # A) Bizim kodları o sanal bilgisayara indir
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # B) Docker Compose'u ayağa kaldır
-      # BURASI EKLENDİ: GitHub'daki sırları Docker'a aktarıyoruz
       - name: Start Containers
         env:
           DB_USER: ${{ secrets.DB_USER }}
@@ -28,18 +22,17 @@ jobs:
           DB_PORT: ${{ secrets.DB_PORT }}
           API_GATEWAY_PORT: ${{ secrets.API_GATEWAY_PORT }}
           CORE_BANKING_PORT: ${{ secrets.CORE_BANKING_PORT }}
-        run: docker-compose up -d --build
+        # DÜZELTME 1: Tire kalktı, boşluk geldi (v2)
+        run: docker compose up -d --build
 
-      # C) Bankanın açılmasını bekle (Veritabanı kurulsun, seed yapılsın)
       - name: Wait for Services (30s)
         run: sleep 30
 
-      # D) API Gateway içindeki testleri çalıştır
-      # 'docker-compose exec' komutu çalışan konteynerin içine girip komut çalıştırır.
       - name: Run Pact Contract Tests 🧪
-        run: docker-compose exec -T api-gateway npm run test:pact
+        # DÜZELTME 2: Tire kalktı, boşluk geldi
+        run: docker compose exec -T api-gateway npm run test:pact
 
-      # E) Temizlik: İş bitince konteynerleri kapat
       - name: Stop Containers
-        if: always() # Test başarısız olsa bile kapat
-        run: docker-compose down
+        if: always()
+        # DÜZELTME 3: Tire kalktı, boşluk geldi
+        run: docker compose down
